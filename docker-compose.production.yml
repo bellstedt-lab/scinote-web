@@ -4,11 +4,12 @@ services:
     container_name: scinote_db_production
     image: postgres:15
     volumes:
-      - scinote_production_postgres:/var/lib/postgresql/data
+      - /apps/scinote-web/mounted_data/db:/var/lib/postgresql/data
     environment:
       - "POSTGRES_USER=postgres"
-      - "POSTGRES_PASSWORD=mysecretpassword"
-
+      - "POSTGRES_PASSWORD=MyVerySecretPassword2023"
+    networks:
+      - internal
   web:
     build:
       context: .
@@ -20,15 +21,27 @@ services:
     tty: true
     depends_on:
       - db
-    ports:
-      - "3000:3000"
     command: bash -c "rm -f /usr/src/app/tmp/pids/server.pid && rails s -b 0.0.0.0"
     environment:
       - RAILS_ENV=production
     volumes:
-      - scinote_production_files:/usr/src/app/public/system
-      - scinote_production_storage:/usr/src/app/storage
-
+      - /apps/scinote-web/mounted_data/system:/usr/src/app/public/system
+      - /apps/scinote-web/mounted_data/storage:/usr/src/app/storage
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.scinote_web_production.entrypoints=http
+      - traefik.http.routers.scinote_web_production.rule=Host("eln.bellstedt-lab.ch")
+      - traefik.http.middlewares.scinote_web_production-https-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.scinote_web_production.middlewares=scinote_web_production-https-redirect
+      - traefik.http.routers.scinote_web_production-secure.entrypoints=https
+      - traefik.http.routers.scinote_web_production-secure.rule=Host("eln.bellstedt-lab.ch")
+      - traefik.http.routers.scinote_web_production-secure.tls=true
+      - traefik.http.routers.scinote_web_production-secure.tls.certresolver=http
+      - traefik.http.services.scinote_web_production.loadbalancer.server.port=3000
+      - traefik.docker.network=traefik-proxy
+    networks:
+      - traefik-proxy
+      - internal
   jobs:
     image: scinote_web_production
     container_name: scinote_jobs_production
@@ -40,10 +53,12 @@ services:
     environment:
       - RAILS_ENV=production
     volumes:
-      - scinote_production_files:/usr/src/app/public/system
-      - scinote_production_storage:/usr/src/app/storage
-
-volumes:
-  scinote_production_postgres:
-  scinote_production_files:
-  scinote_production_storage:
+      - /apps/scinote-web/mounted_data/system:/usr/src/app/public/system
+      - /apps/scinote-web/mounted_data/storage:/usr/src/app/storage
+    networks:
+      - internal
+networks:
+  traefik-proxy:
+    external: true
+  internal:
+    internal: true
