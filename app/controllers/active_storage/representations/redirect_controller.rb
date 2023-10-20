@@ -17,8 +17,7 @@ module ActiveStorage
         end
 
         expires_in ActiveStorage.service_urls_expire_in
-        redirect_to @blob.representation(params[:variation_key]).processed.url(disposition: params[:disposition]),
-                    allow_other_host: true
+        redirect_to @blob.representation(params[:variation_key]).processed.url(disposition: params[:disposition]),allow_other_host: true
       end
 
       private
