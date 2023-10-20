@@ -17,7 +17,8 @@ Rails.application.configure do
   config.action_controller.perform_caching = true
 
   Rails.application.routes.default_url_options = {
-    host: Rails.application.secrets.mail_server_url
+    host: Rails.application.secrets.mail_server_url,
+    protocol: 'https'
   }
 
   # Don't care if the mailer can't send.
