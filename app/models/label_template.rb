@@ -18,7 +18,8 @@ class LabelTemplate < ApplicationRecord
   scope :default, -> { where(default: true) }
 
   def self.enabled?
-    ApplicationSettings.instance.values['label_templates_enabled'] == true
+    true
+    #ApplicationSettings.instance.values['label_templates_enabled'] == true
   end
 
   def icon
