@@ -10,6 +10,7 @@ services:
       - "POSTGRES_PASSWORD=MyVerySecretPassword2023"
     networks:
       - internal
+    restart: unless-stopped
   web:
     build:
       context: .
@@ -42,6 +43,7 @@ services:
     networks:
       - traefik-proxy
       - internal
+    restart: unless-stopped
   jobs:
     image: scinote_web_production
     container_name: scinote_jobs_production
@@ -57,6 +59,7 @@ services:
       - /apps/scinote-web/mounted_data/storage:/usr/src/app/storage
     networks:
       - internal
+    restart: unless-stopped
 networks:
   traefik-proxy:
     external: true

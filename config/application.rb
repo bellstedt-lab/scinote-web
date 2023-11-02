@@ -70,6 +70,9 @@ module Scinote
     # SciNote Core Application version
     VERSION = File.read(Rails.root.join('VERSION')).strip.freeze
 
+    # Enable Label Printing
+    config.label_templates_enabled = true    
+
     # Doorkeeper overrides
     config.to_prepare do
       # Only Authorization endpoint
